@@ -1,0 +1,29 @@
+Symbols: A,B,U,M,F1,F2,F3,W
+Initial conditions: At(U,B), At(M,A),InAir(U),UAV(U), MRobot(M), IsFire(F1), IsFire(F2), IsFire(F3),IsWater(W),EmptyBattery(U),EmptyTank(U)
+Goal conditions: NotFire(F1), NotFire(F2), NotFire(F3)
+
+Actions:
+        Extinguish(x,y,z)
+        Preconditions: At(x,z),InAir(x), IsFire(z),FullTank(x),FullBattery(x),UAV(x),MRobot(y),At(y,z)
+        Effects: !IsFire(z), EmptyTank(x), EmptyBattery(x), NotFire(z), !FullBattery(x),!FullTank(x)
+
+        Land(x,y,z)
+        Preconditions: InAir(x) At(x,z), At(y,z),UAV(x),MRobot(y)
+        Effects: On(x,y),FullBattery(x),!EmptyBattery(x),!InAir(x)
+
+        Takeoff(x,y)
+        Preconditions: UAV(x),MRobot(y),On(x,y),FullBattery(x), FullTank(x)
+        Effects: !On(x,y), InAir(x)
+
+        Move(x,y,w,z)
+        Preconditions: UAV(x), MRobot(y), On(x,y),At(x,w),At(y,w)
+        Effects: At(x,z),At(y,z),!At(x,w),!At(y,w)
+
+        MoveUGV(x,y,w,z)
+        Preconditions: UAV(x),MRobot(y),InAir(x), At(x,z),At(y,w)
+        Effects: At(y,z),!At(y,w)
+
+        FillTank(x,y,z)
+        Preconditions: UAV(x),MRobot(y),On(x,y),EmptyTank(x),At(x,z),At(y,z),IsWater(z)
+        Effects: !EmptyTank(x),FullTank(x)
+
