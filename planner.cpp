@@ -796,43 +796,11 @@ vector<pair<string,int>> get_actions(unordered_set<Action, ActionHasher, ActionC
     return actions;
 }
 
-// vector<list<string>> getPermuations(vector<string> arguments,int num_arguments){
-//     vector<list<string>> argument_permutations;
-//     if (num_arguments == 2){
-//         for(int i=0;i<arguments.size();i++){
-//             for (int j=0;j<arguments.size();j++){
-//                 if (i != j){
-//                     list<string> arg;
-//                     arg.push_back(arguments[i]);
-//                     arg.push_back(arguments[j]);
-//                     argument_permutations.push_back(arg);
-//                 }
-//             }
-//         }
-//     }
-//     else {
-//         for(int i=0;i<arguments.size();i++){
-//             for (int j=0;j<arguments.size();j++){
-//                 for (int k=0;k<arguments.size();k++){
-//                 if (i != j && j!=k && i!=k){
-//                     list<string> arg;
-//                     arg.push_back(arguments[i]);
-//                     arg.push_back(arguments[j]);
-//                     arg.push_back(arguments[k]);
-//                     argument_permutations.push_back(arg);
-//                     }
-//                 }
-//             }
-//         }
-//     }
-//     return argument_permutations;
-// }
 void swap(vector<string>& arguments,int i,int j){
         string temp = arguments[i];
         arguments[i] = arguments[j];
         arguments[j] = temp;
 }
-
 void enumerate(vector<string>& arguments,int n,int k,vector<list<string>>& permutations){
         if (k == 0) {
             list<string> singlePermutation;
@@ -842,7 +810,6 @@ void enumerate(vector<string>& arguments,int n,int k,vector<list<string>>& permu
             permutations.push_back(singlePermutation);
             return;
         }
-
       for (int i = 0; i < n; i++) {
             swap(arguments, i, n-1);
             enumerate(arguments, n-1, k-1, permutations);
@@ -850,20 +817,11 @@ void enumerate(vector<string>& arguments,int n,int k,vector<list<string>>& permu
         }
 
 }
-
 vector<list<string>> getPermuations(vector<string> arguments,int num_arguments){
     vector<list<string>> permutations;
     enumerate(arguments,arguments.size(),num_arguments,permutations);
-    for(const auto& v:permutations){
-        for(const auto& l:v){
-            cout << l << " ";
-        }
-        cout << "\n";
-    }
     return permutations;
 }
-
-
 
 bool checkPreconditions(condition_set state,condition_set precondition){
     for(const auto p:precondition){
@@ -946,56 +904,21 @@ struct Node{
 struct CompareNode { 
     bool operator()(Node* const& n1, Node* const& n2) 
     { 
-        // return "true" if "p1" is ordered  
-        // before "p2", for example: 
         return n1->f_value_ > n2->f_value_; 
     } 
 }; 
-  
 
 list<GroundedAction*>* backTrack(unordered_map<string,Node*>& came_from,condition_set& start,Node* goal){
     list<GroundedAction*>* actions = new list<GroundedAction*>;
     Node* current_state = goal;
-    while (stateToString(current_state->state_) != stateToString(start)) // Backtracking to get the shortest path
+    string start_state = stateToString(start);
+    while (stateToString(current_state->state_) != start_state) // Backtracking to get the shortest path
     {
-        // for (const auto& c:current_state->state_){
-        //     cout << c.toString() << " ";
-        // }
-        // cout << "\n";
-        cout << stateToString(current_state->state_) << endl;
-        cout << current_state->action_->toString() << endl;
         actions->push_back(current_state->action_);
-        current_state = came_from[stateToString(current_state->state_)];
-        
+        current_state = came_from[stateToString(current_state->state_)]; 
     }
-    cout << stateToString(start) << endl;
     return actions;
 }
-
-
-bool expandActionsAndArguments(queue<Node*>& que,unordered_map<string,bool>& visited,unordered_set<Action, ActionHasher, ActionComparator>& action_set,unordered_map<int,vector<list<string>>>& argument_permutations,unordered_map<string,Node*>& came_from,Node*& current_node,Node*& goal_node){
-    for(const Action act:action_set){
-        for(const list<string> arg:argument_permutations[act.get_args().size()]){
-            GroundedAction* grounded_action = getGroundedAction(act,arg);
-            if (checkPreconditions(current_node->state_,grounded_action->get_preconditions())){
-                condition_set* neighbour = applyAction(current_node->state_,grounded_action->get_effects());
-                if (!visited[stateToString(*neighbour)]){
-                    visited[stateToString(*neighbour)] = true;
-                    Node* neighbour_node = new Node(*neighbour,grounded_action,current_node->g_value_+1,0);
-                    came_from[stateToString(*neighbour)] = current_node;
-                    que.push(neighbour_node);
-                    if (checkGoal(*neighbour,goal_node->state_)){
-                        goal_node = neighbour_node;
-                        cout << "Path Found" << endl;
-                        return true;
-                    }
-                }
-            }
-        }
-    }
-    return false;
-}
-
 double getHeuristic(condition_set node,condition_set goal){
     double count  = 0;
     for(const auto goal_conditions:goal){
@@ -1006,24 +929,22 @@ double getHeuristic(condition_set node,condition_set goal){
         }
     }
     return goal.size() - count;
-    // return 0;
 }
 
-
-void expandActionsAndArgumentsAstar(priority_queue<Node*,vector<Node*>,CompareNode>& open_list,unordered_set<string>& closed_list,unordered_set<Action, ActionHasher, ActionComparator>& action_set,unordered_map<int,vector<list<string>>>& argument_permutations,unordered_map<string,Node*>& came_from,Node*& current_node,Node*& goal_node,double edge_cost){
+void expandActionsAndArguments(priority_queue<Node*,vector<Node*>,CompareNode>& open_list,unordered_set<string>& closed_list,unordered_set<Action, ActionHasher, ActionComparator>& action_set,unordered_map<int,vector<list<string>>>& argument_permutations,unordered_map<string,Node*>& came_from,Node*& current_node,Node*& goal_node,double edge_cost){
     for(const Action act:action_set){
         for(const list<string> arg:argument_permutations[act.get_args().size()]){
             GroundedAction* grounded_action = getGroundedAction(act,arg);
             if (checkPreconditions(current_node->state_,grounded_action->get_preconditions())){
                 condition_set* neighbour = applyAction(current_node->state_,grounded_action->get_effects());
-                if (closed_list.find(stateToString(*neighbour)) == closed_list.end()){
+                string neighbour_string = stateToString(*neighbour);
+                if (closed_list.find(neighbour_string) == closed_list.end()){
                     Node* neighbour_node = new Node(*neighbour,grounded_action,INT_MAX,INT_MAX);
                     if(neighbour_node->g_value_ > current_node->g_value_ + edge_cost){
                         neighbour_node->g_value_ =  current_node->g_value_ + edge_cost;
-                        neighbour_node->f_value_ = neighbour_node->g_value_ + 5 * getHeuristic(*neighbour,goal_node->state_);
+                        neighbour_node->f_value_ = neighbour_node->g_value_ + 3 * getHeuristic(*neighbour,goal_node->state_);
                         open_list.push(neighbour_node);
-                        came_from[stateToString(*neighbour)] = current_node;
-     
+                        came_from[neighbour_string] = current_node;
                     }
                 }
             }
@@ -1049,48 +970,6 @@ list<GroundedAction> planner(Env* env)
             argument_permutations[action_names[i].second] = getPermuations(args,action_names[i].second);
         }
     }
-
-    queue<Node*> que;
-    unordered_map<string,Node*> came_from;
-    unordered_map<string,bool> visited;
-    Node* start_node = new Node(start,NULL,0,0);
-    Node* goal_node = new Node(goal,NULL,INT_MAX,0); 
-    Node* current_node = start_node;
-
-    que.push(start_node);
-    visited[stateToString(start_node->state_)] = true;
-    while(!que.empty()){
-        current_node = que.front();
-        que.pop();
-        if (expandActionsAndArguments(que,visited,action_set,argument_permutations,came_from,current_node,goal_node)) break;
-    }
-    list<GroundedAction*>* path = backTrack(came_from,start,goal_node);
-    list<GroundedAction> actions;
-    std::transform(std::begin(*path), std::end(*path),std::front_inserter(actions),[](GroundedAction* item){return *item;});
-    return actions;
-}
-
-
-list<GroundedAction> plannerAstar(Env* env)
-{
-    // this is where you insert your planner
-    condition_set start = env->get_inital_conditions();
-    condition_set goal = env->get_goal_conditions();
-    unordered_set<Action, ActionHasher, ActionComparator> action_set = env->get_all_actions();
-    
-    unordered_set<string> arguments = get_arguements(start);
-    vector<string> args;
-    args.insert(args.end(),arguments.begin(),arguments.end());
-
-    vector<pair<string,int>> action_names = get_actions(env->get_all_actions());
-    unordered_map<int,vector<list<string>>> argument_permutations;
-    for(int i=0;i<action_names.size();i++){
-        if(argument_permutations.find(action_names[i].second) ==  argument_permutations.end()){
-            argument_permutations[action_names[i].second] = getPermuations(args,action_names[i].second);
-        }
-    }
-
-
     unordered_map<string,Node*> came_from;
     Node* start_node = new Node(start,NULL,0,getHeuristic(start,goal));
     Node* goal_node = new Node(goal,NULL,INT_MAX,0);  
@@ -1109,7 +988,7 @@ list<GroundedAction> plannerAstar(Env* env)
             goal_node = current_node;
             break;
         }
-        expandActionsAndArgumentsAstar(open_list,closed_list,action_set,argument_permutations,came_from,current_node,goal_node,edge_cost);
+        expandActionsAndArguments(open_list,closed_list,action_set,argument_permutations,came_from,current_node,goal_node,edge_cost);
     }
     cout << "Backtracking" << endl;
     list<GroundedAction*>*  path = backTrack(came_from,start,goal_node);
@@ -1126,12 +1005,12 @@ int main(int argc, char* argv[])
 
     cout << "Environment: " << filename << endl << endl;
     Env* env = create_env(filename);
-    // if (print_status)
-    // {
-    //     cout << *env;
-    // }
+    if (print_status)
+    {
+        cout << *env;
+    }
 
-    list<GroundedAction> actions = plannerAstar(env);
+    list<GroundedAction> actions = planner(env);
 
     cout << "\nPlan: " << endl;
     for (GroundedAction gac : actions)
