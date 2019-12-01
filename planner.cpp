@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <utility>
 #include <queue>
+#include <time.h>
 
 #define SYMBOLS 0
 #define INITIAL 1
@@ -40,17 +41,17 @@ public:
     GroundedCondition(string predicate, list<string> arg_values, bool truth = true)
     {
         this->predicate = predicate;
-        this->truth = truth;  // fixed
+        this->truth = truth; // fixed
         for (string l : arg_values)
         {
             this->arg_values.push_back(l);
         }
     }
 
-    GroundedCondition(const GroundedCondition& gc)
+    GroundedCondition(const GroundedCondition &gc)
     {
         this->predicate = gc.predicate;
-        this->truth = gc.truth;  // fixed
+        this->truth = gc.truth; // fixed
         for (string l : gc.arg_values)
         {
             this->arg_values.push_back(l);
@@ -71,13 +72,13 @@ public:
         return this->truth;
     }
 
-    friend ostream& operator<<(ostream& os, const GroundedCondition& pred)
+    friend ostream &operator<<(ostream &os, const GroundedCondition &pred)
     {
         os << pred.toString() << " ";
         return os;
     }
 
-    bool operator==(const GroundedCondition& rhs) const
+    bool operator==(const GroundedCondition &rhs) const
     {
         if (this->predicate != rhs.predicate || this->arg_values.size() != rhs.arg_values.size())
             return false;
@@ -116,7 +117,7 @@ public:
 
 struct GroundedConditionComparator
 {
-    bool operator()(const GroundedCondition& lhs, const GroundedCondition& rhs) const
+    bool operator()(const GroundedCondition &lhs, const GroundedCondition &rhs) const
     {
         return lhs == rhs;
     }
@@ -124,7 +125,7 @@ struct GroundedConditionComparator
 
 struct GroundedConditionHasher
 {
-    size_t operator()(const GroundedCondition& gcond) const
+    size_t operator()(const GroundedCondition &gcond) const
     {
         return hash<string>{}(gcond.toString());
     }
@@ -165,13 +166,13 @@ public:
         return this->truth;
     }
 
-    friend ostream& operator<<(ostream& os, const Condition& cond)
+    friend ostream &operator<<(ostream &os, const Condition &cond)
     {
         os << cond.toString() << " ";
         return os;
     }
 
-    bool operator==(const Condition& rhs) const // fixed
+    bool operator==(const Condition &rhs) const // fixed
     {
 
         if (this->predicate != rhs.predicate || this->args.size() != rhs.args.size())
@@ -213,7 +214,7 @@ public:
 
 struct ConditionComparator
 {
-    bool operator()(const Condition& lhs, const Condition& rhs) const
+    bool operator()(const Condition &lhs, const Condition &rhs) const
     {
         return lhs == rhs;
     }
@@ -221,7 +222,7 @@ struct ConditionComparator
 
 struct ConditionHasher
 {
-    size_t operator()(const Condition& cond) const
+    size_t operator()(const Condition &cond) const
     {
         return hash<string>{}(cond.toString());
     }
@@ -237,8 +238,8 @@ private:
 
 public:
     Action(string name, list<string> args,
-        unordered_set<Condition, ConditionHasher, ConditionComparator> preconditions,
-        unordered_set<Condition, ConditionHasher, ConditionComparator> effects)
+           unordered_set<Condition, ConditionHasher, ConditionComparator> preconditions,
+           unordered_set<Condition, ConditionHasher, ConditionComparator> effects)
     {
         this->name = name;
         for (string l : args)
@@ -271,7 +272,7 @@ public:
         return this->effects;
     }
 
-    bool operator==(const Action& rhs) const
+    bool operator==(const Action &rhs) const
     {
         if (this->get_name() != rhs.get_name() || this->get_args().size() != rhs.get_args().size())
             return false;
@@ -279,7 +280,7 @@ public:
         return true;
     }
 
-    friend ostream& operator<<(ostream& os, const Action& ac)
+    friend ostream &operator<<(ostream &os, const Action &ac)
     {
         os << ac.toString() << endl;
         os << "Precondition: ";
@@ -310,7 +311,7 @@ public:
 
 struct ActionComparator
 {
-    bool operator()(const Action& lhs, const Action& rhs) const
+    bool operator()(const Action &lhs, const Action &rhs) const
     {
         return lhs == rhs;
     }
@@ -318,7 +319,7 @@ struct ActionComparator
 
 struct ActionHasher
 {
-    size_t operator()(const Action& ac) const
+    size_t operator()(const Action &ac) const
     {
         return hash<string>{}(ac.get_name());
     }
@@ -387,13 +388,15 @@ public:
         return this->goal_conditions;
     }
 
-    unordered_set<Action, ActionHasher, ActionComparator> get_all_actions() const{
+    unordered_set<Action, ActionHasher, ActionComparator> get_all_actions() const
+    {
         return this->actions;
     }
 
-    friend ostream& operator<<(ostream& os, const Env& w)
+    friend ostream &operator<<(ostream &os, const Env &w)
     {
-        os << "***** Environment *****" << endl << endl;
+        os << "***** Environment *****" << endl
+           << endl;
         os << "Symbols: ";
         for (string s : w.get_symbols())
             os << s + ",";
@@ -423,7 +426,7 @@ private:
     unordered_set<GroundedCondition, GroundedConditionHasher, GroundedConditionComparator> gEffects;
 
 public:
-    GroundedAction(string name, list<string> arg_values,unordered_set<GroundedCondition, GroundedConditionHasher, GroundedConditionComparator> preconditions,unordered_set<GroundedCondition, GroundedConditionHasher, GroundedConditionComparator> effects)
+    GroundedAction(string name, list<string> arg_values, unordered_set<GroundedCondition, GroundedConditionHasher, GroundedConditionComparator> preconditions, unordered_set<GroundedCondition, GroundedConditionHasher, GroundedConditionComparator> effects)
     {
         this->name = name;
         for (string ar : arg_values)
@@ -450,16 +453,16 @@ public:
         return this->arg_values;
     }
 
-    unordered_set<GroundedCondition, GroundedConditionHasher, GroundedConditionComparator>  get_preconditions() const
+    unordered_set<GroundedCondition, GroundedConditionHasher, GroundedConditionComparator> get_preconditions() const
     {
         return this->gPreconditions;
     }
-    unordered_set<GroundedCondition, GroundedConditionHasher, GroundedConditionComparator>  get_effects() const
+    unordered_set<GroundedCondition, GroundedConditionHasher, GroundedConditionComparator> get_effects() const
     {
         return this->gEffects;
     }
 
-    bool operator==(const GroundedAction& rhs) const
+    bool operator==(const GroundedAction &rhs) const
     {
         if (this->name != rhs.name || this->arg_values.size() != rhs.arg_values.size())
             return false;
@@ -477,7 +480,7 @@ public:
         return true;
     }
 
-    friend ostream& operator<<(ostream& os, const GroundedAction& gac)
+    friend ostream &operator<<(ostream &os, const GroundedAction &gac)
     {
         os << gac.toString() << " ";
         return os;
@@ -497,6 +500,23 @@ public:
         return temp;
     }
 };
+struct GroundedActionHasher
+{
+    size_t operator()(const GroundedAction &ac) const
+    {
+        return hash<string>{}(ac.get_name());
+    }
+};
+
+struct GroundedActionComparator
+{
+    bool operator()(const GroundedAction &lhs, const GroundedAction &rhs) const
+    {
+        return lhs == rhs;
+    }
+};
+
+typedef unordered_set<GroundedAction, GroundedActionHasher, GroundedActionComparator> grounded_action_set;
 
 list<string> parse_symbols(string symbols_str)
 {
@@ -513,10 +533,10 @@ list<string> parse_symbols(string symbols_str)
     return symbols;
 }
 
-Env* create_env(char* filename)
+Env *create_env(char *filename)
 {
     ifstream input_file(filename);
-    Env* env = new Env();
+    Env *env = new Env();
     regex symbolStateRegex("symbols:", regex::icase);
     regex symbolRegex("([a-zA-Z0-9_, ]+) *");
     regex initialConditionRegex("initialconditions:(.*)", regex::icase);
@@ -552,7 +572,7 @@ Env* create_env(char* filename)
                     sregex_token_iterator iter(line.begin(), line.end(), symbolRegex, 0);
                     sregex_token_iterator end;
 
-                    env->add_symbols(parse_symbols(iter->str()));  // fixed
+                    env->add_symbols(parse_symbols(iter->str())); // fixed
 
                     parser = INITIAL;
                 }
@@ -564,10 +584,10 @@ Env* create_env(char* filename)
             }
             else if (parser == INITIAL)
             {
-                const char* line_c = line.c_str();
+                const char *line_c = line.c_str();
                 if (regex_match(line_c, initialConditionRegex))
                 {
-                    const std::vector<int> submatches = { 1, 2 };
+                    const std::vector<int> submatches = {1, 2};
                     sregex_token_iterator iter(
                         line.begin(), line.end(), conditionRegex, submatches);
                     sregex_token_iterator end;
@@ -603,10 +623,10 @@ Env* create_env(char* filename)
             }
             else if (parser == GOAL)
             {
-                const char* line_c = line.c_str();
+                const char *line_c = line.c_str();
                 if (regex_match(line_c, goalConditionRegex))
                 {
-                    const std::vector<int> submatches = { 1, 2 };
+                    const std::vector<int> submatches = {1, 2};
                     sregex_token_iterator iter(
                         line.begin(), line.end(), conditionRegex, submatches);
                     sregex_token_iterator end;
@@ -642,7 +662,7 @@ Env* create_env(char* filename)
             }
             else if (parser == ACTIONS)
             {
-                const char* line_c = line.c_str();
+                const char *line_c = line.c_str();
                 if (regex_match(line_c, actionRegex))
                 {
                     parser = ACTION_DEFINITION;
@@ -655,10 +675,10 @@ Env* create_env(char* filename)
             }
             else if (parser == ACTION_DEFINITION)
             {
-                const char* line_c = line.c_str();
+                const char *line_c = line.c_str();
                 if (regex_match(line_c, conditionRegex))
                 {
-                    const std::vector<int> submatches = { 1, 2 };
+                    const std::vector<int> submatches = {1, 2};
                     sregex_token_iterator iter(
                         line.begin(), line.end(), conditionRegex, submatches);
                     sregex_token_iterator end;
@@ -679,10 +699,10 @@ Env* create_env(char* filename)
             }
             else if (parser == ACTION_PRECONDITION)
             {
-                const char* line_c = line.c_str();
+                const char *line_c = line.c_str();
                 if (regex_match(line_c, precondRegex))
                 {
-                    const std::vector<int> submatches = { 1, 2 };
+                    const std::vector<int> submatches = {1, 2};
                     sregex_token_iterator iter(
                         line.begin(), line.end(), conditionRegex, submatches);
                     sregex_token_iterator end;
@@ -722,10 +742,10 @@ Env* create_env(char* filename)
             }
             else if (parser == ACTION_EFFECT)
             {
-                const char* line_c = line.c_str();
+                const char *line_c = line.c_str();
                 if (regex_match(line_c, effectRegex))
                 {
-                    const std::vector<int> submatches = { 1, 2 };
+                    const std::vector<int> submatches = {1, 2};
                     sregex_token_iterator iter(
                         line.begin(), line.end(), conditionRegex, submatches);
                     sregex_token_iterator end;
@@ -778,245 +798,397 @@ Env* create_env(char* filename)
     return env;
 }
 
-unordered_set<string> get_arguements(condition_set& conditions){
+vector<string> get_arguements(condition_set &conditions)
+{
     unordered_set<string> args;
-    for(const GroundedCondition& c:conditions){
-        for(const string str:c.get_arg_values()){
+    for (const GroundedCondition &c : conditions)
+    {
+        for (const string str : c.get_arg_values())
+        {
             args.insert(str);
         }
     }
-    return args;
+    vector<string> args_vec;
+    args_vec.insert(args_vec.end(), args.begin(), args.end());
+    return args_vec;
 }
 
-vector<pair<string,int>> get_actions(unordered_set<Action, ActionHasher, ActionComparator> action_set){
-    vector<pair<string,int>> actions;
-    for(const Action& act:action_set){
-        actions.push_back(make_pair(act.get_name(),act.get_args().size()));
+vector<pair<string, int>> getActionNames(unordered_set<Action, ActionHasher, ActionComparator> action_set)
+{
+    vector<pair<string, int>> actions;
+    for (const Action &act : action_set)
+    {
+        actions.push_back(make_pair(act.get_name(), act.get_args().size()));
     }
     return actions;
 }
 
-void swap(vector<string>& arguments,int i,int j){
-        string temp = arguments[i];
-        arguments[i] = arguments[j];
-        arguments[j] = temp;
+void swap(vector<string> &arguments, int i, int j)
+{
+    string temp = arguments[i];
+    arguments[i] = arguments[j];
+    arguments[j] = temp;
 }
-void enumerate(vector<string>& arguments,int n,int k,vector<list<string>>& permutations){
-        if (k == 0) {
-            list<string> singlePermutation;
-            for (int i = n; i < arguments.size(); i++){
-                singlePermutation.push_back(arguments[i]);
-            }
-            permutations.push_back(singlePermutation);
-            return;
+void enumerate(vector<string> &arguments, int n, int k, vector<list<string>> &permutations)
+{
+    if (k == 0)
+    {
+        list<string> singlePermutation;
+        for (int i = n; i < arguments.size(); i++)
+        {
+            singlePermutation.push_back(arguments[i]);
         }
-      for (int i = 0; i < n; i++) {
-            swap(arguments, i, n-1);
-            enumerate(arguments, n-1, k-1, permutations);
-            swap(arguments, i, n-1);
-        }
+        permutations.push_back(singlePermutation);
+        return;
+    }
+    for (int i = 0; i < n; i++)
+    {
+        swap(arguments, i, n - 1);
+        enumerate(arguments, n - 1, k - 1, permutations);
+        swap(arguments, i, n - 1);
+    }
+}
 
-}
-vector<list<string>> getPermuations(vector<string> arguments,int num_arguments){
+vector<list<string>> getPermuations(vector<string> arguments, int num_arguments)
+{
     vector<list<string>> permutations;
-    enumerate(arguments,arguments.size(),num_arguments,permutations);
+    enumerate(arguments, arguments.size(), num_arguments, permutations);
     return permutations;
 }
 
-bool checkPreconditions(condition_set state,condition_set precondition){
-    for(const auto p:precondition){
-        if(state.find(p) == state.end()) return false;
+bool checkPreconditions(const condition_set &state, const condition_set &precondition)
+{
+    for (const auto &p : precondition)
+    {
+        if (state.find(p) == state.end())
+            return false;
     }
     return true;
 }
 
-condition_set* applyAction(condition_set state,condition_set effect){
-    condition_set* new_state = new condition_set;
-    *new_state = state;
-    for(const auto e:effect){
-        GroundedCondition cond = GroundedCondition(e.get_predicate(),e.get_arg_values());
-        if(!e.get_truth())
-            new_state->erase(cond);
+condition_set applyAction(condition_set &state, condition_set effect)
+{
+    condition_set new_state = state;
+    for (const auto &e : effect)
+    {
+        GroundedCondition cond = GroundedCondition(e.get_predicate(), e.get_arg_values());
+        if (!e.get_truth())
+            new_state.erase(cond);
         else
-            new_state->insert(cond);
+            new_state.insert(cond);
     }
     return new_state;
 }
 
-GroundedAction* getGroundedAction(Action act,list<string> arg){
+condition_set applyActionHeuristic(condition_set &state, condition_set effect)
+{
+    condition_set new_state = state;
+    for (const auto &e : effect)
+    {
+        GroundedCondition cond = GroundedCondition(e.get_predicate(), e.get_arg_values());
+        if (e.get_truth())
+            new_state.insert(cond);
+    }
+    return new_state;
+}
+
+GroundedAction getGroundedAction(Action act, list<string> arg)
+{
     unordered_set<GroundedCondition, GroundedConditionHasher, GroundedConditionComparator> preconditions;
     unordered_set<GroundedCondition, GroundedConditionHasher, GroundedConditionComparator> effects;
     list<string> action_arguments = act.get_args();
-    for(const Condition cond:act.get_preconditions()){
+    for (const Condition cond : act.get_preconditions())
+    {
         list<string> condition_arguments = cond.get_args();
         list<string> grounded_condition_arguments = condition_arguments;
-        for(int i=0;i<condition_arguments.size();i++){
-            for(int j=0;j<action_arguments.size();j++){
-                if (*std::next(condition_arguments.begin(), i) == *std::next(action_arguments.begin(), j)){
+        for (int i = 0; i < condition_arguments.size(); i++)
+        {
+            for (int j = 0; j < action_arguments.size(); j++)
+            {
+                if (*std::next(condition_arguments.begin(), i) == *std::next(action_arguments.begin(), j))
+                {
                     *std::next(grounded_condition_arguments.begin(), i) = *std::next(arg.begin(), j);
                 }
             }
         }
-        preconditions.insert(GroundedCondition(cond.get_predicate(),grounded_condition_arguments,cond.get_truth()));
+        preconditions.insert(GroundedCondition(cond.get_predicate(), grounded_condition_arguments, cond.get_truth()));
     }
-    for(const Condition cond:act.get_effects()){
+    for (const Condition cond : act.get_effects())
+    {
         list<string> condition_arguments = cond.get_args();
         list<string> grounded_condition_arguments = condition_arguments;
-        for(int i=0;i<condition_arguments.size();i++){
-            for(int j=0;j<action_arguments.size();j++){
-                if (*std::next(condition_arguments.begin(), i) == *std::next(action_arguments.begin(), j)){
+        for (int i = 0; i < condition_arguments.size(); i++)
+        {
+            for (int j = 0; j < action_arguments.size(); j++)
+            {
+                if (*std::next(condition_arguments.begin(), i) == *std::next(action_arguments.begin(), j))
+                {
                     *std::next(grounded_condition_arguments.begin(), i) = *std::next(arg.begin(), j);
                 }
             }
         }
-        effects.insert(GroundedCondition(cond.get_predicate(),grounded_condition_arguments,cond.get_truth()));
+        effects.insert(GroundedCondition(cond.get_predicate(), grounded_condition_arguments, cond.get_truth()));
     }
-    return new GroundedAction(act.get_name(),arg,preconditions,effects);
+    return GroundedAction(act.get_name(), arg, preconditions, effects);
 }
 
-string stateToString(condition_set node){
+void getActionArgumentCombinations(grounded_action_set &grounded_actions, unordered_set<Action, ActionHasher, ActionComparator> &action_set, unordered_map<int, vector<list<string>>> &argument_permutations)
+{
+    for (const Action &act : action_set)
+    {
+        for (const list<string> &arg : argument_permutations[act.get_args().size()])
+        {
+            GroundedAction grounded_action = getGroundedAction(act, arg);
+            grounded_actions.insert(grounded_action);
+        }
+    }
+}
+string stateToString(const condition_set &node)
+{
     vector<string> state;
     string stateString;
-    for(const auto& c:node){
+    for (const auto &c : node)
+    {
         state.push_back(c.toString());
     }
-    sort(state.begin(),state.end());
-    for(const auto& c:state){
-        stateString+=c;
+    sort(state.begin(), state.end());
+    for (const auto &c : state)
+    {
+        stateString += c;
     }
     return stateString;
 }
 
-bool checkGoal(condition_set current, condition_set goal){
-    for(const auto& c:goal){
-        if (current.find(c) == current.end()) return false;
+bool checkGoal(condition_set current, condition_set goal)
+{
+    for (const auto &c : goal)
+    {
+        if (current.find(c) == current.end())
+            return false;
     }
     return true;
 }
-struct Node{
+struct Node
+{
     condition_set state_;
     double g_value_;
     double f_value_;
-    GroundedAction* action_;
-    Node(condition_set state,GroundedAction* action,double g_value,double f_value): state_(state),action_(action), g_value_(g_value),f_value_(f_value) {}
-
-};
-struct CompareNode { 
-    bool operator()(Node* const& n1, Node* const& n2) 
-    { 
-        return n1->f_value_ > n2->f_value_; 
-    } 
-}; 
-
-list<GroundedAction*>* backTrack(unordered_map<string,Node*>& came_from,condition_set& start,Node* goal){
-    list<GroundedAction*>* actions = new list<GroundedAction*>;
-    Node* current_state = goal;
-    string start_state = stateToString(start);
-    while (stateToString(current_state->state_) != start_state) // Backtracking to get the shortest path
+    vector<GroundedAction> action_;
+    Node()
     {
-        actions->push_back(current_state->action_);
-        current_state = came_from[stateToString(current_state->state_)]; 
+        g_value_ = 0;
+        f_value_ = 0;
+        action_ = vector<GroundedAction>{};
+    }
+    Node(condition_set state, vector<GroundedAction> action, double g_value, double f_value) : state_(state), action_(action), g_value_(g_value), f_value_(f_value) {}
+};
+struct CompareNode
+{
+    bool operator()(Node const &n1, Node const &n2)
+    {
+        return n1.f_value_ > n2.f_value_;
+    }
+};
+
+list<GroundedAction> backTrack(unordered_map<string, Node> &came_from, condition_set &start, Node goal)
+{
+    list<GroundedAction> actions;
+    Node current_state = goal;
+    string start_state = stateToString(start);
+    while (stateToString(current_state.state_) != start_state) // Backtracking to get the shortest path
+    {
+        actions.push_back(current_state.action_[0]);
+        current_state = came_from[stateToString(current_state.state_)];
     }
     return actions;
 }
-double getHeuristic(condition_set node,condition_set goal){
-    double count  = 0;
-    for(const auto goal_conditions:goal){
-        for(const auto conditions:node){
-            if (goal_conditions == conditions){
-                count++;
-            }
-        }
+double getHeuristic(condition_set &current, condition_set &goal,int heuristic)
+{
+    if(heuristic == 0){
+        return 0;
     }
-    return goal.size() - count;
+    if (heuristic == 1){
+        double count = 0;
+        int weight = 10;
+        for (const auto &goal_condition : goal)
+        {
+            if (current.find(goal_condition) == current.end())
+                count++;
+        }
+        return weight*count;
+    }
+    return 0;
 }
 
-void expandActionsAndArguments(priority_queue<Node*,vector<Node*>,CompareNode>& open_list,unordered_set<string>& closed_list,unordered_set<Action, ActionHasher, ActionComparator>& action_set,unordered_map<int,vector<list<string>>>& argument_permutations,unordered_map<string,Node*>& came_from,Node*& current_node,Node*& goal_node,double edge_cost){
-    for(const Action act:action_set){
-        for(const list<string> arg:argument_permutations[act.get_args().size()]){
-            GroundedAction* grounded_action = getGroundedAction(act,arg);
-            if (checkPreconditions(current_node->state_,grounded_action->get_preconditions())){
-                condition_set* neighbour = applyAction(current_node->state_,grounded_action->get_effects());
-                string neighbour_string = stateToString(*neighbour);
-                if (closed_list.find(neighbour_string) == closed_list.end()){
-                    Node* neighbour_node = new Node(*neighbour,grounded_action,INT_MAX,INT_MAX);
-                    if(neighbour_node->g_value_ > current_node->g_value_ + edge_cost){
-                        neighbour_node->g_value_ =  current_node->g_value_ + edge_cost;
-                        neighbour_node->f_value_ = neighbour_node->g_value_ + 3 * getHeuristic(*neighbour,goal_node->state_);
-                        open_list.push(neighbour_node);
-                        came_from[neighbour_string] = current_node;
-                    }
+void expandActionsAndArgumentsHeuristic(priority_queue<Node, vector<Node>, CompareNode> &open_list, unordered_map<string, double> &g_value_list,
+                               unordered_set<string> &closed_list, grounded_action_set &grounded_actions, unordered_map<string, Node> &came_from,
+                               Node &current_node, Node &goal_node, double edge_cost)
+{
+    for (const GroundedAction &grounded_action : grounded_actions)
+    {
+        if (checkPreconditions(current_node.state_, grounded_action.get_preconditions()))
+        {
+            condition_set neighbour = applyActionHeuristic(current_node.state_, grounded_action.get_effects());
+            string neighbour_string = stateToString(neighbour);
+            if (closed_list.find(neighbour_string) == closed_list.end())
+            {
+                double neighbour_g_value = current_node.g_value_ + edge_cost;
+                auto neighbour_openlist = g_value_list.find(neighbour_string);
+                if (neighbour_openlist == g_value_list.end() || neighbour_g_value < neighbour_openlist->second)
+                {
+                    Node neighbour_node = Node(neighbour, vector<GroundedAction>{grounded_action}, neighbour_g_value, INT_MAX);
+                    neighbour_node.f_value_ = neighbour_node.g_value_;
+                    open_list.push(neighbour_node);
+                    g_value_list[neighbour_string] = neighbour_g_value;
+                    came_from[neighbour_string] = current_node;
                 }
             }
         }
     }
 }
 
-list<GroundedAction> planner(Env* env)
+
+double getAdmissibleHeuristic(grounded_action_set& grounded_actions,condition_set& start,condition_set& goal){
+    Node start_node = Node(start, vector<GroundedAction>{}, 0, 0);
+    Node goal_node = Node(goal, vector<GroundedAction>{}, 0, 0);
+    Node current_node = start_node;
+    unordered_map<string, Node> came_from;
+    priority_queue<Node, vector<Node>, CompareNode> open_list;
+    unordered_set<string> closed_list;
+    unordered_map<string, double> g_value_list;
+    double edge_cost = 1;
+    string current_node_string;
+    open_list.push(start_node);
+    g_value_list[stateToString(start_node.state_)] = start_node.g_value_;
+    while (!open_list.empty())
+    {
+        current_node = open_list.top();
+        open_list.pop();
+        current_node_string = stateToString(current_node.state_);
+        closed_list.insert(current_node_string);
+        if (checkGoal(current_node.state_, goal))
+        {
+            goal_node = current_node;
+            break;
+        }
+        expandActionsAndArgumentsHeuristic(open_list, g_value_list, closed_list, grounded_actions, came_from, current_node, goal_node, edge_cost);
+    }
+    list<GroundedAction> actions = backTrack(came_from, start, goal_node);
+    return actions.size();
+}
+
+void expandActionsAndArguments(priority_queue<Node, vector<Node>, CompareNode> &open_list, unordered_map<string, double> &g_value_list,
+                               unordered_set<string> &closed_list, grounded_action_set &grounded_actions, unordered_map<string, Node> &came_from,
+                               Node &current_node, Node &goal_node, double edge_cost,int heuristic)
+{
+    for (const GroundedAction &grounded_action : grounded_actions)
+    {
+        if (checkPreconditions(current_node.state_, grounded_action.get_preconditions()))
+        {
+            condition_set neighbour = applyAction(current_node.state_, grounded_action.get_effects());
+            string neighbour_string = stateToString(neighbour);
+            if (closed_list.find(neighbour_string) == closed_list.end())
+            {
+                double neighbour_g_value = current_node.g_value_ + edge_cost;
+                auto neighbour_openlist = g_value_list.find(neighbour_string);
+                if (neighbour_openlist == g_value_list.end() || neighbour_g_value < neighbour_openlist->second)
+                {
+                    Node neighbour_node = Node(neighbour, vector<GroundedAction>{grounded_action}, neighbour_g_value, INT_MAX);
+                    if (heuristic == 2)
+                        neighbour_node.f_value_ = neighbour_node.g_value_ + getAdmissibleHeuristic(grounded_actions,neighbour_node.state_,goal_node.state_);
+                    else 
+                        neighbour_node.f_value_ = neighbour_node.g_value_ + getHeuristic(neighbour, goal_node.state_,heuristic);
+                    open_list.push(neighbour_node);
+                    g_value_list[neighbour_string] = neighbour_g_value;
+                    came_from[neighbour_string] = current_node;
+                }
+            }
+        }
+    }
+}
+
+
+
+list<GroundedAction> planner(Env *env,int heuristic)
 {
     // this is where you insert your planner
     condition_set start = env->get_inital_conditions();
     condition_set goal = env->get_goal_conditions();
     unordered_set<Action, ActionHasher, ActionComparator> action_set = env->get_all_actions();
-    
-    unordered_set<string> arguments = get_arguements(start);
-    vector<string> args;
-    args.insert(args.end(),arguments.begin(),arguments.end());
+    vector<string> arguments = get_arguements(start);
 
-    vector<pair<string,int>> action_names = get_actions(env->get_all_actions());
-    unordered_map<int,vector<list<string>>> argument_permutations;
-    for(int i=0;i<action_names.size();i++){
-        if(argument_permutations.find(action_names[i].second) ==  argument_permutations.end()){
-            argument_permutations[action_names[i].second] = getPermuations(args,action_names[i].second);
+    vector<pair<string, int>> action_names = getActionNames(action_set);
+    unordered_map<int, vector<list<string>>> argument_permutations;
+    for (int i = 0; i < action_names.size(); i++)
+    {
+        if (argument_permutations.find(action_names[i].second) == argument_permutations.end())
+        {
+            argument_permutations[action_names[i].second] = getPermuations(arguments, action_names[i].second);
         }
     }
-    unordered_map<string,Node*> came_from;
-    Node* start_node = new Node(start,NULL,0,getHeuristic(start,goal));
-    Node* goal_node = new Node(goal,NULL,INT_MAX,0);  
-    Node* current_node = start_node;
-    priority_queue<Node*,vector<Node*>,CompareNode> open_list;
+    grounded_action_set grounded_actions;
+    unordered_map<string, Node> came_from;
+    getActionArgumentCombinations(grounded_actions, action_set, argument_permutations);
+    Node start_node = Node(start, vector<GroundedAction>{}, 0, getHeuristic(start, goal,heuristic));
+    Node goal_node = Node(goal, vector<GroundedAction>{}, INT_MAX, 0);
+    Node current_node = start_node;
+    priority_queue<Node, vector<Node>, CompareNode> open_list;
     unordered_set<string> closed_list;
+    unordered_map<string, double> g_value_list;
     double edge_cost = 1;
+    string current_node_string;
     open_list.push(start_node);
-
-    while(!open_list.empty()){
+    g_value_list[stateToString(start_node.state_)] = start_node.g_value_;
+    while (!open_list.empty())
+    {
         current_node = open_list.top();
         open_list.pop();
-        closed_list.insert(stateToString(current_node->state_));
-        if (checkGoal(current_node->state_,goal)){
+        current_node_string = stateToString(current_node.state_);
+        closed_list.insert(current_node_string);
+        if (checkGoal(current_node.state_, goal))
+        {
             cout << "Path Found" << endl;
             goal_node = current_node;
             break;
         }
-        expandActionsAndArguments(open_list,closed_list,action_set,argument_permutations,came_from,current_node,goal_node,edge_cost);
+        expandActionsAndArguments(open_list, g_value_list, closed_list, grounded_actions, came_from, current_node, goal_node, edge_cost,heuristic);
     }
+    cout << "States Expanded " << closed_list.size() << endl;
     cout << "Backtracking" << endl;
-    list<GroundedAction*>*  path = backTrack(came_from,start,goal_node);
-    list<GroundedAction> actions;
-    std::transform(std::begin(*path), std::end(*path),std::front_inserter(actions),[](GroundedAction* item){return *item;});
+    list<GroundedAction> actions = backTrack(came_from, start, goal_node);
+    actions.reverse();
     return actions;
 }
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     // DO NOT CHANGE THIS FUNCTION
-    char* filename = (char*)("fire.txt");
-    if (argc > 1)
+    char *filename = (char *)("fire.txt");
+    int heuristic = 1; // 0 Dijsktra(No Heuristic) 1 Inadmissble Heuristic 2 Admissble Heuristic
+    if (argc > 1){
         filename = argv[1];
+        heuristic = stoi(argv[2]);
+    }
 
-    cout << "Environment: " << filename << endl << endl;
-    Env* env = create_env(filename);
+    cout << "Environment: " << filename << endl
+         << endl;
+    Env *env = create_env(filename);
     if (print_status)
     {
         cout << *env;
     }
 
-    list<GroundedAction> actions = planner(env);
-
+    std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
+    list<GroundedAction> actions = planner(env,heuristic);
+    std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> time_span = t2 - t1;
+    double time = time_span.count()/1000.0;
+    cout << "Plan Took: " << time << " seconds\n";
+    cout << "Plan Length: " << actions.size() << "\n";
     cout << "\nPlan: " << endl;
+
     for (GroundedAction gac : actions)
     {
         cout << gac << endl;
     }
-
     return 0;
 }
